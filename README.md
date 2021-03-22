@@ -5,7 +5,7 @@ First:
 - Clone this repo:
 `git clone git@github.com:donaldziff/w209.git`
 
-- Get the latest database 
+- Get the latest database
  - If you're on the ischool server you copy it:
    `cp ~ziff/w209-databases/products.db w209`
  - Or you can get it from the shared google drive:
@@ -15,7 +15,7 @@ First:
 For your local machine:
 - Create a virtual environment with python >=3.7
 - Install Dependencies:
-  - With PIP: `pip install -r requirement.txt`
+  - With PIP: `pip install -r requirements.txt`
   - With Anaconda: `conda install --file requirements.txt`
 
 - Run the web app with
@@ -50,4 +50,3 @@ Run the dataload notebook to create a new product db that holds those results, a
 any other query data you add to the input_files directory. The dataload notebook a new
 column `tag` with the name of that subdirectory (or '.') so it's easy to restrict the db
 to any subset.
-
