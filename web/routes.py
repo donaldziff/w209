@@ -294,6 +294,163 @@ def rong1():
     return render_template('all_category.html', context=context )
 
 
+@app.route("/max1")
+def max1():
+    # Loading raw data and clean it
+    df = utils.load_data()
+    df = utils.clean_data(df)
+
+    ## to drop off outliers, choose data that has 'Est_Monthly_Sales' <1500 & 'Reviews' <200)
+    source = df.loc[(df['Est_Monthly_Sales'] <1500) & (df['Reviews'] <40)]
+
+    brush = alt.selection(type='interval', resolve='global')
+
+    height=300
+    width=300
+
+    ## chart1-High Demand and Low Competition
+    chart1 = alt.Chart(source,title="High Demand and Low Competition").transform_calculate(
+        url='https://www.amazon.com/dp/' + alt.datum.ASIN
+    ).mark_circle(size=60).encode(
+        x = alt.X('Reviews', scale=alt.Scale(domain=[0, 40])),
+        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+        color=alt.condition(brush, 'Category:N', alt.ColorValue('whitesmoke'), legend=None),
+        tooltip=['Product_Name','url:N','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price',]
+    ).add_selection(
+        brush).properties(
+        height=height,
+        width=width)
+
+    ## chart2 - High Demand and Bad Marketing
+    chart2 = alt.Chart(source,title="High Demand and Bad Marketing").mark_circle(size=60).encode(
+        x='LQS',
+        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+        color=alt.condition(brush, 'Category:N', alt.ColorValue('whitesmoke'), legend=None),
+        tooltip=['Product_Name','ASIN','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price',]
+    ).add_selection(
+        brush).properties(
+        height=height,
+        width=width)
+
+    ## chart3 - Good Return on Investment  
+    chart3 = alt.Chart(source,title="Good Return on Investment").mark_circle(size=60).encode(
+        x='Net',
+        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+        color=alt.condition(brush, 'Category:N', alt.ColorValue('whitesmoke'), legend=None),
+        tooltip=['Product_Name','ASIN','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price',]
+    ).add_selection(
+        brush).properties(
+        height=height,
+        width=width)
+
+    ## chart4 - Good Demand & Poor Quality
+
+    chart4 = alt.Chart(source,title="Good Demand & Poor Quality").mark_circle(size=60).encode(
+        x='Rating',
+        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+        color=alt.condition(brush, 'Category:N', alt.ColorValue('whitesmoke'), legend=None),
+        tooltip=['Product_Name','ASIN','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price',]
+    ).add_selection(
+        brush).properties(
+        height=height,
+        width=width)
+
+    ## line1 Est_Monthly_Sales >= 200
+    line1 = alt.Chart(pd.DataFrame({'y': [200]})).mark_rule(color='red').encode(y='y')
+    ## line2 Reviews <=50
+    line2 = alt.Chart(pd.DataFrame({'x': [50]})).mark_rule(color='red').encode(x='x')
+    ## line3 LQS <6
+    line3 = alt.Chart(pd.DataFrame({'x': [6]})).mark_rule(color='red').encode(x='x')
+    ## line4 Price>20
+    line4 = alt.Chart(pd.DataFrame({'x': [20]})).mark_rule(color='red').encode(x='x')
+    ## line5 Net>15
+    line5 = alt.Chart(pd.DataFrame({'y': [15]})).mark_rule(color='red').encode(y='y')
+    ## line6 Rating<3.7
+    line6 = alt.Chart(pd.DataFrame({'x': [3.7]})).mark_rule(color='red').encode(x='x')
+    
+    plot_product_scatterchart =  chart1 + line1 + line2|chart2 + line1 + line3|chart3 + line5 +line4|chart4 + line1 + line6
+    
+    plot_product_scatterchart_json = plot_product_scatterchart.to_json()
+
+
+    #########################################
+    # ploting - AMZN Product Data Bar Chart
+    #########################################
+
+    plot_product_bar = alt.Chart(df).mark_bar().encode(
+    x='LQS',
+    y='Net:Q',
+    color= 'Category:N',
+    tooltip=['Sellers', 'LQS', 'Reviews', 'Rank', 'Fees', 'Net', 'Est_Monthly_Sales','Est_Monthly_Revenue', 'Category', 'Product_Name']
+).properties(width=375, height=200)
+
+    plot_product_bar_json = plot_product_bar.to_json()
+
+    #########################################
+    # ploting - AMZN Product Data Line Chart
+    #########################################
+
+    plot_product_line = alt.Chart(df).mark_line().encode(
+    x='Rank',
+    y='Reviews:Q',
+    color= 'Category:N',
+    tooltip=['Sellers', 'LQS', 'Reviews', 'Rank', 'Fees', 'Net', 'Est_Monthly_Sales','Est_Monthly_Revenue', 'Category', 'Product_Name']
+).properties(width=375, height=200)
+
+    plot_product_line_json = plot_product_line.to_json()
+
+    ###############################################
+    # ploting - AMZN Product Data Bar Chart by Year
+    ###############################################
+
+    plot_product_bar_year = alt.Chart(df).mark_bar().encode(
+    x='year(Date_First_Available):T',
+    y='Price',
+    color='Category',
+    tooltip=['year(Date_First_Available)', 'Sellers', 'LQS', 'Reviews', 'Rank', 'Fees', 'Net', 'Est_Monthly_Sales','Est_Monthly_Revenue', 'Category', 'Product_Name']
+).properties(
+            height=200,
+            width=375,
+            ).interactive()
+
+    plot_product_bar_year_json = plot_product_bar_year.to_json()
+
+    #########################################################
+    # ploting - AMZN Product Data Bar Chart by Year/Qtr/Month
+    #########################################################
+
+    plot_product_bar_yearqtrmonth = alt.Chart(df).mark_bar().encode(
+    x='yearquartermonth(Date_First_Available):T',
+    y='Price',
+    color='Category',
+    tooltip=['yearquartermonth(Date_First_Available)', 'Sellers', 'LQS', 'Reviews', 'Rank', 'Fees', 'Net', 'Est_Monthly_Sales','Est_Monthly_Revenue', 'Category', 'Product_Name']
+).properties(
+            height=200,
+            width=375,
+            ).interactive()
+
+    plot_product_bar_yearqtrmonth_json = plot_product_bar_yearqtrmonth.to_json()
+
+    ################################
+    # finalize data send to template
+    ################################
+    total_category_count = "23"
+    total_product_count = df.shape[0]
+    average_rank = "5"
+
+
+    context = {"total_category_count": total_category_count,
+               "total_product_count": total_product_count,
+               "average_rank": average_rank,
+               "plot_scatterchart_product": plot_product_scatterchart_json,
+               "plot_bar_product": plot_product_bar_json,
+               "plot_line_product": plot_product_line_json,
+               "plot_bar_year_product": plot_product_bar_year_json,
+               "plot_bar_yearqtrmonth_product": plot_product_bar_yearqtrmonth_json
+               }
+
+    return render_template('all_category.html', context=context )
+
 # Ivan changed code 2-3-2021
 @app.route("/category", methods=['POST'])
 def plot_category():
