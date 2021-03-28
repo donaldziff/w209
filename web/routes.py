@@ -23,8 +23,11 @@ def plot_all_category_global():
 
     brush = alt.selection(type='interval', resolve='global')
 
-    ## chart1-High Demand and Low Competion
-    chart1 = alt.Chart(source,title="High Demand and Low Competion").transform_calculate(
+    height=300
+    width=300
+
+    ## chart1-High Demand and Low Competition
+    chart1 = alt.Chart(source,title="High Demand and Low Competition").transform_calculate(
         url='https://www.amazon.com/dp/' + alt.datum.ASIN
     ).mark_circle(size=60).encode(
         x='Reviews',
@@ -33,8 +36,8 @@ def plot_all_category_global():
         tooltip=['Product_Name','url:N','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price',]
     ).add_selection(
         brush).properties(
-        height=400,
-        width=400)
+        height=height,
+        width=width)
 
     ## chart2 - High Demand and Bad Marketing
     chart2 = alt.Chart(source,title="High Demand and Bad Marketing").mark_circle(size=60).encode(
@@ -44,8 +47,8 @@ def plot_all_category_global():
         tooltip=['Product_Name','ASIN','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price',]
     ).add_selection(
         brush).properties(
-        height=400,
-        width=400)
+        height=height,
+        width=width)
 
     ## chart3 - Good Return on Investment  
     chart3 = alt.Chart(source,title="Good Return on Investment").mark_circle(size=60).encode(
@@ -55,8 +58,8 @@ def plot_all_category_global():
         tooltip=['Product_Name','ASIN','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price',]
     ).add_selection(
         brush).properties(
-        height=400,
-        width=400)
+        height=height,
+        width=width)
 
     ## chart4 - Good Demand & Poor Quality
 
@@ -67,8 +70,8 @@ def plot_all_category_global():
         tooltip=['Product_Name','ASIN','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price',]
     ).add_selection(
         brush).properties(
-        height=400,
-        width=400)
+        height=height,
+        width=width)
 
     ## line1 Est_Monthly_Sales >= 200
     line1 = alt.Chart(pd.DataFrame({'y': [200]})).mark_rule(color='red').encode(y='y')
