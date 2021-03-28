@@ -135,8 +135,8 @@ def plot_all_category_global():
 
 
 
-@app.route("/max1")
-def max1():
+@app.route("/rong1")
+def rong1():
     # Loading raw data and clean it
     df = utils.load_data()
     df = utils.clean_data(df)
