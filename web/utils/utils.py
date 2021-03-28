@@ -117,6 +117,8 @@ def clean_data(df):
     # Clean data and convert to float data type
     df['Reviews'] = df['Reviews'].apply(clean_numeric_data).astype('float')
 
+    df['Rating'] = df['Rating'].apply(clean_numeric_data).astype('float')
+
     df.Est_Monthly_Revenue
 
     return df
