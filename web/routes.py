@@ -18,6 +18,130 @@ def plot_all_category_global():
     df = utils.clean_data(df)
 
 
+    #########################################
+    # ploting - AMZN Product Data ScatterPlot
+    #########################################
+
+    brush = alt.selection_interval()
+
+    input_dropdown = alt.binding_select(options=["Arts, Crafts & Sewing", "Automotive", "Baby", "Beauty & Personal Care",  "Clothing, Shoes & Jewelry", "Health & Household", "Home & Kitchen", "Kitchen & Dining", "Musical Instruments", "Patio, Lawn & Garden", "Pet Supplies", "Sports & Outdoors", "Tools & Home Improvement", "Toys & Games", "Video Games"], name="Select a category..." )
+
+    selection = alt.selection_single(fields=['Category'], bind=input_dropdown, clear=alt.EventStream(type='dblclick'))
+
+    points = alt.Chart(df).mark_circle().encode(
+        x='Est_Monthly_Sales:Q',
+        y='Est_Monthly_Revenue:Q',
+        color = alt.condition(selection,
+                                alt.Color('Category:N', legend=None),
+                                alt.value('lightgray')),
+        tooltip=['Sellers', 'LQS', 'Reviews', 'Rank', 'Fees', 'Net', 'Est_Monthly_Sales','Est_Monthly_Revenue', 'Category', 'Product_Name']
+    ).properties(width=1000, height=500).add_selection(
+        brush
+    ).add_selection(
+        selection
+    ).transform_filter(
+        selection)
+
+    bars = alt.Chart(df).mark_bar().encode(
+        y='Category:N',
+        color='Category:N',
+        x='count(Category):Q'
+    ).properties(width=1000, height=200).transform_filter(
+        brush
+    )
+
+    plot_product_scatterchart =  points & bars
+
+    plot_product_scatterchart_json = plot_product_scatterchart.to_json()
+
+
+    #########################################
+    # ploting - AMZN Product Data Bar Chart
+    #########################################
+
+    plot_product_bar = alt.Chart(df).mark_bar().encode(
+    x='LQS',
+    y='Net:Q',
+    color= 'Category:N',
+    tooltip=['Sellers', 'LQS', 'Reviews', 'Rank', 'Fees', 'Net', 'Est_Monthly_Sales','Est_Monthly_Revenue', 'Category', 'Product_Name']
+).properties(width=375, height=200)
+
+    plot_product_bar_json = plot_product_bar.to_json()
+
+    #########################################
+    # ploting - AMZN Product Data Line Chart
+    #########################################
+
+    plot_product_line = alt.Chart(df).mark_line().encode(
+    x='Rank',
+    y='Reviews:Q',
+    color= 'Category:N',
+    tooltip=['Sellers', 'LQS', 'Reviews', 'Rank', 'Fees', 'Net', 'Est_Monthly_Sales','Est_Monthly_Revenue', 'Category', 'Product_Name']
+).properties(width=375, height=200)
+
+    plot_product_line_json = plot_product_line.to_json()
+
+    ###############################################
+    # ploting - AMZN Product Data Bar Chart by Year
+    ###############################################
+
+    plot_product_bar_year = alt.Chart(df).mark_bar().encode(
+    x='year(Date_First_Available):T',
+    y='Price',
+    color='Category',
+    tooltip=['year(Date_First_Available)', 'Sellers', 'LQS', 'Reviews', 'Rank', 'Fees', 'Net', 'Est_Monthly_Sales','Est_Monthly_Revenue', 'Category', 'Product_Name']
+).properties(
+            height=200,
+            width=375,
+            ).interactive()
+
+    plot_product_bar_year_json = plot_product_bar_year.to_json()
+
+    #########################################################
+    # ploting - AMZN Product Data Bar Chart by Year/Qtr/Month
+    #########################################################
+
+    plot_product_bar_yearqtrmonth = alt.Chart(df).mark_bar().encode(
+    x='yearquartermonth(Date_First_Available):T',
+    y='Price',
+    color='Category',
+    tooltip=['yearquartermonth(Date_First_Available)', 'Sellers', 'LQS', 'Reviews', 'Rank', 'Fees', 'Net', 'Est_Monthly_Sales','Est_Monthly_Revenue', 'Category', 'Product_Name']
+).properties(
+            height=200,
+            width=375,
+            ).interactive()
+
+    plot_product_bar_yearqtrmonth_json = plot_product_bar_yearqtrmonth.to_json()
+
+    ################################
+    # finalize data send to template
+    ################################
+    total_category_count = "23"
+    total_product_count = df.shape[0]
+    average_rank = "5"
+
+
+    context = {"total_category_count": total_category_count,
+               "total_product_count": total_product_count,
+               "average_rank": average_rank,
+               "plot_scatterchart_product": plot_product_scatterchart_json,
+               "plot_bar_product": plot_product_bar_json,
+               "plot_line_product": plot_product_line_json,
+               "plot_bar_year_product": plot_product_bar_year_json,
+               "plot_bar_yearqtrmonth_product": plot_product_bar_yearqtrmonth_json
+               }
+
+    return render_template('all_category.html', context=context )
+
+
+
+@app.route("/max1")
+def max1():
+    # Loading raw data and clean it
+    df = utils.load_data()
+    df = utils.clean_data(df)
+
+
     ## to drop off outliers, choose data that has 'Est_Monthly_Sales' <1500 & 'Reviews' <200)
     source = df.loc[(df['Est_Monthly_Sales'] <1500) & (df['Reviews'] <200)]
 
