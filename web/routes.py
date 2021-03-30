@@ -10,6 +10,109 @@ import altair as alt
 
 alt.data_transformers.disable_max_rows()
 
+def make_plots(source):
+
+    # category selection
+    
+    cat_selection = alt.selection_single(empty = 'all', fields=['Category'], clear=alt.EventStream(type='dblclick'))
+    cat_color = alt.condition(cat_selection, 'Category:N', alt.ColorValue('whitesmoke'), legend=None)
+    cat_legend = alt.Chart(source).mark_circle(size=80).encode(
+        y=alt.Y('Category:N', axis=alt.Axis(orient='right')),
+        color=cat_color
+    ).add_selection(
+        cat_selection
+    )
+
+    # scatterplot global configuration - with single selection
+    width=400
+    height=375
+    circle_size=60
+    single_select = alt.selection_single(empty = 'all', fields=['ASIN'], clear=alt.EventStream(type='dblclick'))
+    color = alt.condition(single_select, 'Category:N', alt.ColorValue('whitesmoke'), legend=None)
+
+    tooltip=['Product_Name','ASIN','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price']
+
+
+    # individual plots
+
+    ## reviews_vs_sales - High Demand and Low Competition
+    reviews_vs_sales = alt.Chart(source,title=["Reviews vs. Demand", "Number of Reviews indicates Competition"]).mark_circle(size=circle_size).encode(
+        x = 'Reviews',
+        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+        color=color,
+        tooltip=tooltip
+    ).transform_filter(
+        cat_selection
+    ).add_selection(
+        single_select
+    ).properties(
+        height=height,
+        width=width
+    )
+
+    ## lqs_vs_sales - High Demand and Bad Marketing
+    lqs_vs_sales = alt.Chart(source,title=["Listing Quality Score vs. Demand", "Low LQS indicates Bad Marketing"]).mark_circle(
+        size=circle_size).encode(
+        x='LQS',
+        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+        color=color,
+        tooltip=tooltip
+    ).add_selection(
+        single_select
+    ).transform_filter(
+        cat_selection
+    ).properties(
+        height=height,
+        width=width)
+
+    net_vs_sales = alt.Chart(source,title=["Estimated Net vs Demand", "Indicates Return on Investment"]).mark_circle(
+        size=circle_size).encode(
+        x='Net',
+        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+        color=color,
+        tooltip=tooltip
+    ).add_selection(
+        single_select
+    ).transform_filter(
+        cat_selection
+    ).properties(
+        height=height,
+        width=width)
+
+    rating_vs_sales = alt.Chart(source,title=["Quality Rating vs Demand", "Low Quality indicates Opportunity"]).mark_circle(
+        size=circle_size).encode(
+        x='Rating',
+        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+        color=color,
+        tooltip=tooltip
+    ).add_selection(
+        single_select
+    ).transform_filter(
+        cat_selection
+    ).properties(
+        height=height,
+        width=width)
+
+    # guide lines
+
+    sales_y = alt.Chart(pd.DataFrame({'y': [200]})).mark_rule(color='red').encode(y='y')
+    reviews_x = alt.Chart(pd.DataFrame({'x': [50]})).mark_rule(color='red').encode(x='x')
+    lqs_x = alt.Chart(pd.DataFrame({'x': [5.5]})).mark_rule(color='red').encode(x='x')
+    net_x = alt.Chart(pd.DataFrame({'x': [15]})).mark_rule(color='red').encode(x='x')
+    rating_x = alt.Chart(pd.DataFrame({'x': [3.7]})).mark_rule(color='red').encode(x='x')
+
+    reviews_plot = reviews_vs_sales + sales_y + reviews_x
+    lqs_plot = lqs_vs_sales + sales_y + lqs_x
+    net_plot = net_vs_sales + sales_y + net_x
+    rating_plot = rating_vs_sales + sales_y +rating_x
+
+    plots = {'reviews': reviews_plot,
+             'lqs': lqs_plot,
+             'net': net_plot,
+             'rating': rating_plot,
+             'cat_legend': cat_legend}
+    return plots
+
 @app.route("/")
 @app.route("/allcategory")
 def plot_all_category_global():
@@ -17,41 +120,18 @@ def plot_all_category_global():
     df = utils.load_data()
     df = utils.clean_data(df)
 
+    ## drop off outliers
+    df = df.loc[(df['Est_Monthly_Sales'] <1500) & (df['Reviews'] <60)]
 
-    #########################################
-    # ploting - AMZN Product Data ScatterPlot
-    #########################################
-
-    brush = alt.selection_interval()
-
-    input_dropdown = alt.binding_select(options=["Arts, Crafts & Sewing", "Automotive", "Baby", "Beauty & Personal Care",  "Clothing, Shoes & Jewelry", "Health & Household", "Home & Kitchen", "Kitchen & Dining", "Musical Instruments", "Patio, Lawn & Garden", "Pet Supplies", "Sports & Outdoors", "Tools & Home Improvement", "Toys & Games", "Video Games"], name="Select a category..." )
-
-    selection = alt.selection_single(fields=['Category'], bind=input_dropdown, clear=alt.EventStream(type='dblclick'))
-
-    points = alt.Chart(df).mark_circle().encode(
-        x='Est_Monthly_Sales:Q',
-        y='Est_Monthly_Revenue:Q',
-        color = alt.condition(selection,
-                                alt.Color('Category:N', legend=None),
-                                alt.value('lightgray')),
-        tooltip=['Sellers', 'LQS', 'Reviews', 'Rank', 'Fees', 'Net', 'Est_Monthly_Sales','Est_Monthly_Revenue', 'Category', 'Product_Name']
-    ).properties(width=1000, height=500).add_selection(
-        brush
-    ).add_selection(
-        selection
-    ).transform_filter(
-        selection)
-
-    bars = alt.Chart(df).mark_bar().encode(
-        y='Category:N',
-        color='Category:N',
-        x='count(Category):Q'
-    ).properties(width=1000, height=200).transform_filter(
-        brush
-    )
-
-    plot_product_scatterchart =  points & bars
-
+    plots = make_plots(df)
+    reviews_plot = plots['reviews']
+    lqs_plot = plots['lqs'] 
+    cat_legend = plots['cat_legend']
+    net_plot = plots['net']
+    rating_plot = plots['rating']
+    
+    plot_product_scatterchart =  ( reviews_plot | lqs_plot | cat_legend ) & ( net_plot | rating_plot)
+    
     plot_product_scatterchart_json = plot_product_scatterchart.to_json()
 
 
@@ -116,9 +196,9 @@ def plot_all_category_global():
     ################################
     # finalize data send to template
     ################################
-    total_category_count = "23"
+    total_category_count = df['Category'].unique().shape[0]
     total_product_count = df.shape[0]
-    average_rank = "5"
+    average_rank = round(df["Rating"].mean(),2)
 
 
     context = {"total_category_count": total_category_count,
@@ -132,9 +212,6 @@ def plot_all_category_global():
                }
 
     return render_template('all_category.html', context=context )
-
-
-
 
 # Ivan changed code 2-3-2021
 @app.route("/category", methods=['POST'])
