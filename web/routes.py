@@ -10,11 +10,7 @@ import altair as alt
 
 alt.data_transformers.disable_max_rows()
 
-def make_plots(df):
-
-    ## drop off outliers
-    source = df.loc[(df['Est_Monthly_Sales'] <1500) & (df['Reviews'] <60)]
-
+def make_plots(source):
 
     # category selection
     
@@ -124,6 +120,9 @@ def plot_all_category_global():
     df = utils.load_data()
     df = utils.clean_data(df)
 
+    ## drop off outliers
+    df = df.loc[(df['Est_Monthly_Sales'] <1500) & (df['Reviews'] <60)]
+
     plots = make_plots(df)
     reviews_plot = plots['reviews']
     lqs_plot = plots['lqs'] 
@@ -197,9 +196,9 @@ def plot_all_category_global():
     ################################
     # finalize data send to template
     ################################
-    total_category_count = "23"
+    total_category_count = df['Category'].unique().shape[0]
     total_product_count = df.shape[0]
-    average_rank = "5"
+    average_rank = round(df["Rating"].mean(),2)
 
 
     context = {"total_category_count": total_category_count,
