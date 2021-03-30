@@ -21,17 +21,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
     <link rel="stlesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vega-tooltip@0.16.0/vega-tooltip.scss">
-    
+
     <!-- Import Vega 3 & Vega-Lite 2 (does not have to be from CDN) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-tooltip@0.16.0/build/vega-tooltip.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js"></script>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/vega@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@3.0.0-rc12"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@3"></script>
     <script src="https://vega.github.io/datalib/datalib.min.js"></script>
-    
+
     <!-- Import Plotly (does not have to be from CDN) -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
@@ -43,7 +43,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js'></script>
     {% block script %}
     {% endblock script %}
-    
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -98,43 +98,54 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
                                 <li class="nav-item">
                                     <a href="{{ url_for('plot_all_category_global')}}" class="nav-link ">
-                                        
+
                                         <p>All category</p>
                                     </a>
-                                </li>                            
+                                </li>
                             </ul>
                         </li>
+
+<!-- 3/28/2021:  Ivan's code turn-off Per Category Menu option (Begin) -->
+
                         <!-- Chart.js -->
+
+<!-- 3/28/2021:  Ivan's code turn-off Per Category Menu option
                         <li class="nav-item has-treeview menu-closed">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>
-                                    Per category plot 
+                                    Per category plot
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
+3/28/2021 -->
 
- 
+
 <!-- Begin of Ivan's code: Category -->
-                
+<!-- 3/28/2021:  Ivan's code turn-off Per Category Menu option
+
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="#" class="nav-link ">
-                                
+
                                         <p>Category Name</p>
                                     </a>
                                 </li>
                                 <li>
+3/28/2021 -->
                                 <!-- /.Categorya selector -->
+
+<!-- 3/28/2021:  Ivan's code turn-off Per Category Menu option
                                 <form  method="POST" action="{{url_for('plot_category')}}">
                                     <select name="category_name" id="category_name" required="required" style="width:200px">
                                         <option value="" label="Select a category ... " selected="selected">Select a category ... </option>
                                             <option value="Appliances">Appliances</option>
                                             <option value="Arts, Crafts & Sewing">Arts, Crafts & Sewing</option>
                                             <option value="Automotive">Automotive</option>
-                                        
+3/28/2021 -->
                                         <!-- Turn off these options for now by Ivan -->
-                                        
+
+<!-- 3/28/2021:  Ivan's code turn-off Per Category Menu option
                                             <option value="Baby">Baby</option>
                                             <option value="Beauty & Personal Care">Beauty & Personal Care</option>
                                             <option value="Camera & Photo">Camera & Photo</option>
@@ -151,12 +162,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                             <option value="Patio, Lawn & Garden">Patio, Lawn & Garden</option>
                                             <option value="Pet Supplies">Pet Supplies</option>
                                             <option value="Software">Software</option>
-                                            <option value="Sports & Outdoors">Sports & Outdoors</option> 
+                                            <option value="Sports & Outdoors">Sports & Outdoors</option>
                                             <option value="Tools & Home Improvement">Tools & Home Improvement</option>
                                             <option value="Toys & Games">Toys & Games</option>
                                             <option value="Video Games">Video Games</option>
+3/28/2021 -->
+
                                             <!-- Turn off these options for now by Ivan -->
 
+<!-- 3/28/2021:  Ivan's code turn-off Per Category Menu option
                                     </select>
                                 </li>
                                 <li>
@@ -164,10 +178,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
                                 </li>
                                 </form>
                             </ul>
-
+3/28/2021 -->
 <!-- End of Ivan's code: Category -->
-                        
+
+<!-- 3/28/2021:  Ivan's code turn-off Per Category Menu option (End)
                         </li>
+3/28/2021 -->
+                        
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
