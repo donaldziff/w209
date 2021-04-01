@@ -13,7 +13,7 @@ alt.data_transformers.disable_max_rows()
 def make_plots(source):
 
     # category selection
-    
+
     cat_selection = alt.selection_single(empty = 'all', fields=['Category'], clear=alt.EventStream(type='dblclick'))
     cat_color = alt.condition(cat_selection, 'Category:N', alt.ColorValue('whitesmoke'), legend=None)
     cat_legend = alt.Chart(source).mark_circle(size=80).encode(
@@ -125,15 +125,18 @@ def plot_all_category_global():
 
     plots = make_plots(df)
     reviews_plot = plots['reviews']
-    lqs_plot = plots['lqs'] 
+    lqs_plot = plots['lqs']
     cat_legend = plots['cat_legend']
     net_plot = plots['net']
     rating_plot = plots['rating']
-    
+
     plot_product_scatterchart =  ( reviews_plot | lqs_plot | cat_legend ) & ( net_plot | rating_plot)
-    
+
     plot_product_scatterchart_json = plot_product_scatterchart.to_json()
 
+
+    '''
+    # 3/31/2021 (Ivan) Begin: Comment out this block of code to remove the 4 graphs.
 
     #########################################
     # ploting - AMZN Product Data Bar Chart
@@ -193,6 +196,10 @@ def plot_all_category_global():
 
     plot_product_bar_yearqtrmonth_json = plot_product_bar_yearqtrmonth.to_json()
 
+
+    # 3/31/2021 (Ivan) End: Comment out this block of code to remove the 4 graphs.
+    '''
+
     ################################
     # finalize data send to template
     ################################
@@ -200,6 +207,8 @@ def plot_all_category_global():
     total_product_count = df.shape[0]
     average_rank = round(df["Rating"].mean(),2)
 
+    '''
+    # 3/31/2021 (Ivan) Begin: Comment out this block of code to remove the 4 graphs.
 
     context = {"total_category_count": total_category_count,
                "total_product_count": total_product_count,
@@ -209,6 +218,15 @@ def plot_all_category_global():
                "plot_line_product": plot_product_line_json,
                "plot_bar_year_product": plot_product_bar_year_json,
                "plot_bar_yearqtrmonth_product": plot_product_bar_yearqtrmonth_json
+               }
+
+    # 3/31/2021 (Ivan) End: Comment out this block of code to remove the 4 graphs.
+    '''
+
+    context = {"total_category_count": total_category_count,
+               "total_product_count": total_product_count,
+               "average_rank": average_rank,
+               "plot_scatterchart_product": plot_product_scatterchart_json
                }
 
     return render_template('all_category.html', context=context )
