@@ -28,70 +28,62 @@ def make_plots(source):
     height=375
     circle_size=60
     single_select = alt.selection_single(empty = 'all', fields=['ASIN'], clear=alt.EventStream(type='dblclick'))
-    color = alt.condition(single_select, 'Category:N', alt.ColorValue('whitesmoke'), legend=None)
+    color = alt.condition(single_select, 'Category:N', alt.ColorValue('transparent'), legend=None)
 
     tooltip=['Product_Name','ASIN','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price']
 
 
+    def make_base_chart(x, title):
+        result = alt.Chart(source, title=title).mark_circle(size=circle_size).encode(
+            x = x,
+            y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+            color=color,
+            tooltip=tooltip
+        ).transform_filter(
+            cat_selection
+        ).add_selection(
+            single_select
+        ).properties(
+            height=height,
+            width=width
+        )
+        return result
+
     # individual plots
+    
+    from altair import datum
 
-    ## reviews_vs_sales - High Demand and Low Competition
-    reviews_vs_sales = alt.Chart(source,title=["Reviews vs. Demand", "Number of Reviews indicates Competition"]).mark_circle(size=circle_size).encode(
-        x = 'Reviews',
-        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
-        color=color,
-        tooltip=tooltip
-    ).transform_filter(
-        cat_selection
-    ).add_selection(
-        single_select
-    ).properties(
-        height=height,
-        width=width
-    )
+    # sliders galore
+    def make_slider_set(dimension, min, max, step):
+        range_start = alt.binding_range(min=min, max=max, step=step, name=dimension + ' start:')
+        range_end = alt.binding_range(min=min, max=max, step=step, name=dimension + ' end:')
 
-    ## lqs_vs_sales - High Demand and Bad Marketing
-    lqs_vs_sales = alt.Chart(source,title=["Listing Quality Score vs. Demand", "Low LQS indicates Bad Marketing"]).mark_circle(
-        size=circle_size).encode(
-        x='LQS',
-        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
-        color=color,
-        tooltip=tooltip
-    ).add_selection(
-        single_select
-    ).transform_filter(
-        cat_selection
-    ).properties(
-        height=height,
-        width=width)
+        select_range_start = alt.selection_single(name=dimension + "_select_range_start", fields=[dimension], bind=range_start, init={dimension: min})
+        select_range_end   = alt.selection_single(name=dimension + "_select_range_end"  , fields=[dimension], bind=range_end,   init={dimension: max})
 
-    net_vs_sales = alt.Chart(source,title=["Estimated Net vs Demand", "Indicates Return on Investment"]).mark_circle(
-        size=circle_size).encode(
-        x='Net',
-        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
-        color=color,
-        tooltip=tooltip
-    ).add_selection(
-        single_select
-    ).transform_filter(
-        cat_selection
-    ).properties(
-        height=height,
-        width=width)
+        return {'start': select_range_start, 
+                'end': select_range_end}
 
-    rating_vs_sales = alt.Chart(source,title=["Quality Rating vs Demand", "Low Quality indicates Opportunity"]).mark_circle(
-        size=circle_size).encode(
-        x='Rating',
-        y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
-        color=color,
-        tooltip=tooltip
-    ).add_selection(
-        single_select
-    ).transform_filter(
-        cat_selection
-    ).properties(
-        height=height,
-        width=width)
+    sliders = {}
+    sliders['Est_Monthly_Sales'] = make_slider_set('Est_Monthly_Sales', 0, 1600, 10)
+    sliders['LQS'] = make_slider_set('LQS', 0, 8, .5)
+    sliders['Reviews'] = make_slider_set('Reviews', 0, 60, 1)
+    sliders['Net'] = make_slider_set('Net', 0, 45, 1)
+    sliders['Rating'] = make_slider_set('Rating', 0, 5, .5)
+
+    def add_sliders(c):
+        for dimension in ['Est_Monthly_Sales', 'LQS', 'Reviews', 'Net', 'Rating']:
+            c = c.add_selection(sliders[dimension]['start'], sliders[dimension]['end']
+            ).transform_filter(
+                (datum[dimension] >= sliders[dimension]['start'][dimension]) & 
+                (datum[dimension] <= sliders[dimension]['end'][dimension])
+            )
+        return c
+
+    reviews_vs_sales = add_sliders(make_base_chart('Reviews', ["Reviews vs. Demand", "Number of Reviews indicates Competition"]))
+    lqs_vs_sales = add_sliders(make_base_chart('LQS', ["Listing Quality Score vs. Demand", "Low LQS indicates Bad Marketing"]))
+    net_vs_sales = add_sliders(make_base_chart('Net', ["Estimated Net vs Demand", "Indicates Return on Investment"]))
+    rating_vs_sales = add_sliders(make_base_chart('Rating', ["Quality Rating vs Demand", "Low Quality indicates Opportunity"]))
 
     # guide lines
 
