@@ -222,7 +222,6 @@ def plot_all_category_global():
 
     # 3/31/2021 (Ivan) End: Comment out this block of code to remove the 4 graphs.
     '''
-
     context = {"total_category_count": total_category_count,
                "total_product_count": total_product_count,
                "average_rank": average_rank,
@@ -282,3 +281,19 @@ def plot_category():
                }
 
     return render_template('category.html', context=context)
+
+
+##################################
+# 4/5/2021 Add about page by Ivan
+##################################
+@app.route("/about")
+def show_about_page():
+
+    ################################
+    # finalize data send to template
+    ################################
+    page_name = "About"
+
+    context = {"page_name": page_name}
+
+    return render_template('about.html', context=context)
