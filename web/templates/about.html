@@ -1,0 +1,135 @@
+{% extends "layout.html" %}
+{% block script %}
+<!--
+put your custom script or styling here
+-->
+{% endblock script %}
+{% block my_content %}
+
+
+<!-- row -->
+
+    <h1>&nbsp;&nbsp;
+      {{context.page_name}}
+    </h1>
+    <br>
+
+    <h2>
+      &nbsp;&nbsp;
+      AN INTERACTIVE VISUALIZATION OF AMAZON FBA PRODUCT SELECTION FOR FIRST TIME SELLER
+    </h2>
+    <br>
+
+    <h3>
+       &nbsp;&nbsp;
+       Using data provided by  <a href="https://www.junglescout.com/">Jungle Scout</a> (16 product categories | 4670 unique products), this visualization shows 4 pointers for first time sellers when it comes to narrowing the search on Amazon product selection.
+    </h3>
+    <br>
+
+    <h3>
+      &nbsp;&nbsp;
+      About Our Product:
+    </h3>
+
+    <h5>
+      &nbsp;&nbsp;
+      <ul>
+        <li>
+          We defined the 4 pointers (show below tables) and configured them within the diagrams (by the red threshold line).
+        </li>
+        <table>
+          <tr>
+            <td>High Demand + Low Competition</td>
+            <td>Monthly Sales >200</td>
+            <td>Review <50</td>
+          </tr>
+          <tr>
+            <td>High Demand + Bad Marketing</td>
+            <td>Monthly Sales >200</td>
+            <td>LQS < 5.5</td>
+          </tr>
+          <tr>
+            <td>Good Return on Investment </td>
+            <td>Monthly Sales >200</td>
+            <td>Net > 15</td>
+          </tr>
+          <tr>
+            <td>Good Demand + Poor Quality Product </td>
+            <td>Monthly Sales >20</td>
+            <td>Rating<3.7</td>
+          </tr>
+        </table>
+        <li>
+          The user is welcomed to use the sliders to define their own pointers so as to find the product they are looking for.
+        </li>
+        <li>
+          The user can click on the category button to get a facet view of each product category (double click on any blank area to get back to the multi category view).</li>
+        <li>
+          The user can click on any product point to observe if this particular product has met with all 4 predefined pointers  (double click on any blank area to get back to the multi products view)
+        </li>
+        <li>
+          When the user hovers the mouse over a product point, a tooltip appears to show more details about the product, so as to provide more insights about this product.
+        </li>
+      </ul>
+    </h5>
+    <br>
+
+    <h3>
+      &nbsp;&nbsp;
+      Concept & Design:
+    </h3>
+
+    <h5>
+      &nbsp;&nbsp;
+      <ul>
+        <li>
+          <a href="https://github.com/donaldziff/w209">Github Repo</a>
+        </li>
+      </ul>
+    </h5>
+    <br>
+
+
+    <h3>
+      &nbsp;&nbsp;
+      Programming:
+    </h3>
+
+    <h5>
+      &nbsp;&nbsp;
+      <ul>
+        <li>
+          Ivan Wong - Engineering Director @ Oracle (<a href="https://www.linkedin.com/in/ivancwong/">Linkedin</a>)
+        </li>
+        <li>
+          Donald Ziff - Senior Hacker @ Altiscale (<a href="https://www.linkedin.com/in/donaldziff/">Linkedin</a>)
+        </li>
+        <li>
+          Rong Yang - Program Manager @ Google (<a href="https://www.linkedin.com/in/rong-yang-cpa-02982157/">Linkedin</a>)
+        </li>
+      </ul>
+    </h5> <br>
+
+
+    <head>
+    <style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+    </style>
+    </head>
+
+
+{% endblock my_content %}
