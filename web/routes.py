@@ -24,8 +24,8 @@ def make_plots(source):
     )
 
     # scatterplot global configuration - with single selection
-    width=400
-    height=375
+    width=300
+    height=300
     circle_size=60
     single_select = alt.selection_single(empty = 'all', fields=['ASIN'], clear=alt.EventStream(type='dblclick'))
     color = alt.condition(single_select, 'Category:N', alt.ColorValue('transparent'), legend=None)
