@@ -56,10 +56,31 @@ put your custom script or styling here
     </div>
     -->
     <!-- Ivan added codes 2/5/2021 -->
+    <!--
     <div class="row">
+    -->
         <!-- Placeholder for scatterchart_product -->
+    <!--
         <div id="scatterchart_product"></div>
     </div>
+    -->
+    
+  <div class="row">
+    <div class="col-lg-8">
+    <!--
+      <h3>Chart</h3>
+    -->
+      <div id="scatterchart_product"></div>
+    </div>
+    <div class="col-lg">
+    <!--
+    <h3>Slider</h3>
+    -->
+    <div id="slider">
+      <div id="oldchildslider"></div>
+    </div>
+    </div>
+  </div>
 
 
     <!-- Ivan added codes 2/6/2021 -->
@@ -110,10 +131,29 @@ put your custom script or styling here
             renderer: "svg",
             actions: { export: true, source: false, editor: false }
         };
-        vegaEmbed("#" + div, url, opt, function (error, result) {
+	vegaEmbed("#" + div, url).then(function(result) {
             // result.view is the Vega View, url is the original Vega-Lite specification
-            vegaTooltip.vegaLite(result.view, url);
+            const sliders = document.getElementsByClassName('vega-bindings');
+            const newparent = document.getElementById('slider');
+            const oldchild = document.getElementById("oldchildslider");
+            newparent.replaceChild(sliders[0], oldchild);
         });
+        /* vegaEmbed("#" + div, url, opt, function (error, result) {
+            // result.view is the Vega View, url is the original Vega-Lite specification
+	    console.log('before tooltip')
+            vegaTooltip.vegaLite(result.view, url);
+	    console.log('after tooltip')
+            const sliders = document.getElementsByClassName('vega-bindings');
+            const newparent = document.getElementById('slider');
+            const oldchild = document.getElementById("oldchildslider");
+            newparent.replaceChild(sliders[0], oldchild);
+        }); */
+	/*vegaEmbed('#vis', spec).then(function(result) {
+            const sliders = document.getElementsByClassName('vega-bindings');
+            const newparent = document.getElementById('slider');
+            const oldchild = document.getElementById("oldchildslider");
+            newparent.replaceChild(sliders[0], oldchild);
+          }).catch(console.error); */
     }
     //Parse your Json variable here
     // parse({{ context.plot_scatterchart_player | safe }},"scatterchart_player");
