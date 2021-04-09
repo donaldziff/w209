@@ -36,7 +36,10 @@ def make_plots(source):
     def make_base_chart(x, title):
         result = alt.Chart(source, title=title).mark_circle(size=circle_size).encode(
             x = x,
-            y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+
+            # 4/8/2021 (Ivan): Change the y-axis label
+            # y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
+            y = alt.Y('Est_Monthly_Sales', title='Est Monthly Sales, y', scale=alt.Scale(domain=[0, 1600])),
             color=color,
             tooltip=tooltip
         ).transform_filter(
@@ -50,7 +53,7 @@ def make_plots(source):
         return result
 
     # individual plots
-    
+
     from altair import datum
 
     # sliders galore
@@ -61,7 +64,7 @@ def make_plots(source):
         select_range_start = alt.selection_single(name=dimension + "_select_range_start", fields=[dimension], bind=range_start, init={dimension: min})
         select_range_end   = alt.selection_single(name=dimension + "_select_range_end"  , fields=[dimension], bind=range_end,   init={dimension: max})
 
-        return {'start': select_range_start, 
+        return {'start': select_range_start,
                 'end': select_range_end}
 
     sliders = {}
@@ -75,7 +78,7 @@ def make_plots(source):
         for dimension in ['Est_Monthly_Sales', 'LQS', 'Reviews', 'Net', 'Rating']:
             c = c.add_selection(sliders[dimension]['start'], sliders[dimension]['end']
             ).transform_filter(
-                (datum[dimension] >= sliders[dimension]['start'][dimension]) & 
+                (datum[dimension] >= sliders[dimension]['start'][dimension]) &
                 (datum[dimension] <= sliders[dimension]['end'][dimension])
             )
         return c
