@@ -16,8 +16,8 @@ def make_plots(source):
 
     cat_selection = alt.selection_single(empty = 'all', fields=['Category'], clear=alt.EventStream(type='dblclick'))
     cat_color = alt.condition(cat_selection, 'Category:N', alt.ColorValue('whitesmoke'), legend=None)
-    cat_legend = alt.Chart(source).mark_circle(size=80).encode(
-        y=alt.Y('Category:N', axis=alt.Axis(orient='right')),
+    cat_legend = alt.Chart(source, title=['Category', 'Click here']).mark_circle(size=80).encode(
+        y=alt.Y('Category:N', title=" ", axis=alt.Axis(orient='right')),
         color=cat_color
     ).add_selection(
         cat_selection
@@ -30,16 +30,15 @@ def make_plots(source):
     single_select = alt.selection_single(empty = 'all', fields=['ASIN'], clear=alt.EventStream(type='dblclick'))
     color = alt.condition(single_select, 'Category:N', alt.ColorValue('transparent'), legend=None)
 
-    tooltip=['Product_Name','ASIN','Est_Monthly_Sales','Category','Reviews', 'LQS', 'Net','Price']
+    tooltip=[alt.Tooltip('Product_Name', title='Name'), 'ASIN', alt.Tooltip('Est_Monthly_Sales', title='Monthly Sales'),
+         'Category', 'Reviews', 'LQS', 'Net', 'Price']
 
 
     def make_base_chart(x, title):
         result = alt.Chart(source, title=title).mark_circle(size=circle_size).encode(
-            x = x,
-
-            # 4/8/2021 (Ivan): Change the y-axis label
-            # y = alt.Y('Est_Monthly_Sales', scale=alt.Scale(domain=[0, 1600])),
-            y = alt.Y('Est_Monthly_Sales', title='Est Monthly Sales, y', scale=alt.Scale(domain=[0, 1600])),
+            x = alt.X(x, title=x),
+            # x = x,
+            y = alt.Y('Est_Monthly_Sales', title='Monthly Sales', scale=alt.Scale(domain=[0, 1600])),
             color=color,
             tooltip=tooltip
         ).transform_filter(
@@ -52,14 +51,14 @@ def make_plots(source):
         )
         return result
 
-    # individual plots
-
     from altair import datum
 
     # sliders galore
-    def make_slider_set(dimension, min, max, step):
-        range_start = alt.binding_range(min=min, max=max, step=step, name=dimension + ' start:')
-        range_end = alt.binding_range(min=min, max=max, step=step, name=dimension + ' end:')
+    def make_slider_set(dimension, min, max, step, name=None):
+        if name is None:
+            name = dimension
+        range_start = alt.binding_range(min=min, max=max, step=step, name=name + ' (min)')
+        range_end = alt.binding_range(min=min, max=max, step=step, name=name + ' (max)')
 
         select_range_start = alt.selection_single(name=dimension + "_select_range_start", fields=[dimension], bind=range_start, init={dimension: min})
         select_range_end   = alt.selection_single(name=dimension + "_select_range_end"  , fields=[dimension], bind=range_end,   init={dimension: max})
@@ -68,7 +67,7 @@ def make_plots(source):
                 'end': select_range_end}
 
     sliders = {}
-    sliders['Est_Monthly_Sales'] = make_slider_set('Est_Monthly_Sales', 0, 1600, 10)
+    sliders['Est_Monthly_Sales'] = make_slider_set('Est_Monthly_Sales', 0, 1600, 10, name='Monthly Sales')
     sliders['LQS'] = make_slider_set('LQS', 0, 8, .5)
     sliders['Reviews'] = make_slider_set('Reviews', 0, 60, 1)
     sliders['Net'] = make_slider_set('Net', 0, 45, 1)
